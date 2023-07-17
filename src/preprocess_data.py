@@ -48,18 +48,15 @@ def generate_labeled_qa_pairs(data_raw_path, data_processed_path):
     data_neg = split_data(data_neg, "Incorrect Answers")
 
     # Concatenate question and answer, with separator
-    data_pos["Full"] = get_qa_pair_prompts(
-        data_pos["Question"], data_pos["Correct Answers"])
-    data_neg["Full"] = get_qa_pair_prompts(
-        data_neg["Question"], data_neg["Incorrect Answers"])
+    data_pos["Full"] = get_qa_pair_prompts(data_pos["Question"], data_pos["Correct Answers"])
+    data_neg["Full"] = get_qa_pair_prompts(data_neg["Question"], data_neg["Incorrect Answers"])
 
     # Create unified dataframe
     data_pos["Label"] = 1
     data_neg["Label"] = 0
 
     labeled_qa_pairs = pd.concat((data_pos, data_neg))[["Full", "Label"]]
-    labeled_qa_pairs = labeled_qa_pairs.reset_index().drop(
-        columns=["index"])  # Fixes index
+    labeled_qa_pairs = labeled_qa_pairs.reset_index().drop(columns=["index"])  # Fixes index
 
     labeled_qa_pairs.to_csv(data_processed_path, index=False)
     print("Dataset successfully processed")

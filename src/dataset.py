@@ -8,13 +8,9 @@ from torch.utils.data.sampler import SubsetRandomSampler, SequentialSampler
 
 
 class QADataset(Dataset):
-    def __init__(self, data, tokenizer):
+    def __init__(self, data):
         self.data = data
         self.data_len = len(data)
-
-        self.tokenizer = tokenizer
-        self.yes_idx = tokenizer("Yes").input_ids[0]
-        self.no_idx = tokenizer("No").input_ids[0]
 
     def __len__(self):
         return self.data_len
@@ -29,8 +25,6 @@ class QADataset(Dataset):
 class PadCollate():
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
-        self.yes_idx = tokenizer("Yes").input_ids[0]
-        self.no_idx = tokenizer("No").input_ids[0]
 
     def __call__(self, batch):
         qa, labels = zip(*batch)
@@ -49,7 +43,7 @@ def create_qa_dataloaders(input_filepath, tokenizer, train_prop, batch_size, shu
     one for training and one for testing. 
     """
     data = pd.read_csv(input_filepath)
-    dataset = QADataset(data, tokenizer)
+    dataset = QADataset(data)
 
     # Create splits
     indices = list(range(len(dataset)))
