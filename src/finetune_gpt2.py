@@ -44,21 +44,21 @@ def train(gpt2_model,
     if int8_training:
         model = prepare_model_for_int8_training(model)
     if lora_training:
-        config = LoraConfig(
+        peft_config = LoraConfig(
             task_type=TaskType.SEQ_CLS,
             r=8,
             lora_alpha=32,
             lora_dropout=0.1,
             bias="none",
         )
-        model = get_peft_model(model, config)
+        model = get_peft_model(model, peft_config)
         print_trainable_parameters(model)
 
     optimizer = AdamW(model.parameters(), lr=lr)
     train_loader, test_loader = create_qa_dataloaders(data_processed_path, tokenizer, train_prop, batch_size, shuffle)
 
     # Logging
-    config = {
+    wandb_config = {
         "gpt2_model": gpt2_model,
         "batch size": batch_size,
         "lr": lr,
@@ -70,7 +70,7 @@ def train(gpt2_model,
     wandb.init(
         project="Finetuning-TruthfulQA-MemoryOptim",
         name=None,
-        config=config
+        config=wandb_config
     )
     
     acc_every_batch = 50  # GLobal step window to calculate accuracy over

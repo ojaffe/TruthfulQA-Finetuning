@@ -54,6 +54,6 @@ def create_qa_dataloaders(input_filepath, tokenizer, train_prop, batch_size, shu
     train_indices, test_indices = indices[:train_split], indices[train_split:]
 
     train_loader = DataLoader(dataset, batch_size=batch_size, collate_fn=PadCollate(tokenizer), sampler=SubsetRandomSampler(train_indices))
-    test_loader = DataLoader(dataset, batch_size=batch_size, collate_fn=PadCollate(tokenizer), sampler=SequentialSampler(test_indices))
+    test_loader = DataLoader(dataset, batch_size=batch_size, collate_fn=PadCollate(tokenizer), sampler=SubsetRandomSampler(test_indices))
 
     return train_loader, test_loader
