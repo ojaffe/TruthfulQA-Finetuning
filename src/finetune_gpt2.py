@@ -17,7 +17,6 @@ def train(gpt2_model,
           lr, 
           epochs,
           seed,
-          fp16, 
           int8_training, 
           lora_training):
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -34,8 +33,11 @@ def train(gpt2_model,
     shuffle = True
 
     # Model
-    tokenizer = GPT2Tokenizer.from_pretrained(gpt2_model, load_in_8bit=int8_training)
-    model = GPT2ForSequenceClassification.from_pretrained(gpt2_model, num_labels=2).to(device)
+    tokenizer = GPT2Tokenizer.from_pretrained(gpt2_model)
+    model = GPT2ForSequenceClassification.from_pretrained(gpt2_model, num_labels=2, load_in_8bit=int8_training)
+
+    if not int8_training:
+        model = model.to(device)
 
     tokenizer.add_special_tokens({"pad_token": "<PAD>"})
     model.config.pad_token_id = tokenizer.pad_token_id
@@ -63,7 +65,6 @@ def train(gpt2_model,
         "batch size": batch_size,
         "lr": lr,
         "epochs": epochs,
-        "fp16": fp16,
         "int8_training": int8_training,
         "lora_training": lora_training,
     }
@@ -91,7 +92,7 @@ def train(gpt2_model,
             attention_mask = attention_mask.to(device)
             labels = labels.to(device)
 
-            if fp16:
+            if int8_training:
                 with torch.cuda.amp.autocast():
                     output = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
             else:
@@ -131,7 +132,7 @@ def train(gpt2_model,
                         attention_mask = attention_mask.to(device)
                         labels = labels.to(device)
 
-                        if fp16:
+                        if int8_training:
                             with torch.cuda.amp.autocast():
                                 output = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
                         else:
@@ -165,7 +166,6 @@ if __name__ == "__main__":
     parser.add_argument("--lr", type=float, default=5e-5)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument('--fp16', action='store_true', default=False)
     parser.add_argument('--int8_training', action='store_true', default=False)
     parser.add_argument('--lora_training', action='store_true', default=False)
     args = parser.parse_args()
@@ -174,6 +174,5 @@ if __name__ == "__main__":
           lr=args.lr,
           epochs=args.epochs,
           seed=args.seed,
-          fp16=args.fp16,
           int8_training=args.int8_training,
           lora_training=args.lora_training)
