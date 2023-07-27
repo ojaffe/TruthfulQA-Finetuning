@@ -173,10 +173,12 @@ if __name__ == "__main__":
     parser.add_argument('--int8_training', action='store_true', default=False)
     parser.add_argument('--lora_training', action='store_true', default=False)
     args = parser.parse_args()
-    train(gpt2_model=args.gpt2_model,
+    train(
+          gpt2_model=args.gpt2_model,
           batch_size=args.batch_size,
           lr=args.lr,
           epochs=args.epochs,
           seed=args.seed,
           int8_training=args.int8_training,
-          lora_training=args.lora_training)
+          lora_training=args.lora_training
+    )

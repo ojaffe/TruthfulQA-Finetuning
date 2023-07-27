@@ -4,10 +4,10 @@ Results on the AWS g5.xlarge instance with batch size of 16:
 
 Model | Original | New |
 | --- | --- | --- |
-GPT-2 Small, 124M| 3.0GB | 0.6GB |
-GPT-2 Medium, 335M | 8.4GB | 1.6GB |
-GPT-2 Large, 774M | 18.7GB | 3.5GB |
-GPT-2 XL, 1.5B | (Too big to test) | 6.8GB |
+GPT-2 Small, 124M| 3.0GB | 0.7GB |
+GPT-2 Medium, 335M | 8.4GB | 1.5GB |
+GPT-2 Large, 774M | 18.7GB | 2.7GB |
+GPT-2 XL, 1.5B | (Too big to test) | 4.5GB |
 
 Example usage to finetune GPT-2 medium:
 ```
