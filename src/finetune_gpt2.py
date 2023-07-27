@@ -45,6 +45,7 @@ def train(gpt2_model,
 
     if int8_training:
         model = prepare_model_for_int8_training(model)
+        scaler = torch.cuda.amp.GradScaler()
     if lora_training:
         peft_config = LoraConfig(
             task_type=TaskType.SEQ_CLS,
@@ -95,15 +96,18 @@ def train(gpt2_model,
             if int8_training:
                 with torch.cuda.amp.autocast():
                     output = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+
+                loss = output.loss
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
             else:
                 output = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
 
-            loss = output.loss
-            scaler.scale(loss).backward()
-
-            scaler.step(optimizer)
-            scaler.update()
-
+                loss = output.loss
+                loss.backward()
+                optimizer.step()
+            
             # Metrics
             metrics = {"train/loss": loss}
             wandb.log(metrics)
